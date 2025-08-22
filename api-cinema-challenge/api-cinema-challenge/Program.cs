@@ -17,7 +17,7 @@ builder.Services.AddDbContext<CinemaContext>();
 
 // security
 builder.Services.AddAuthentication().AddJwtBearer();
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
