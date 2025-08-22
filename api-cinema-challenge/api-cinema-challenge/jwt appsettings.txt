@@ -1,12 +1,11 @@
-"Authentication": {
-    "DefaultScheme": "LocalAuthIssuer",
-    "Schemes": {
-      "Bearer": {
-        "ValidAudiences": [
-          "https://localhost:7259",
-          "http://localhost:5259"
-        ],
-        "ValidIssuer": "dotnet-user-jwts"
-      }
-    }
-  },
+"SiteSettings": {
+  "AdminEmail": "example@test.com",
+  "AdminPassword": "administrator"
+},
+
+"JwtTokenSettings": {
+  "ValidIssuer": "ExampleIssuer",
+  "ValidAudience": "ExampleAudience",
+  "SymmetricSecurityKey": "v89h3bh89vh9ve8hc89nv98nn899cnccn998ev80vi809jberh89b",
+  "JwtRegisteredClaimNamesSub": "rbveer3h535nn3n35nyny5umbbt"
+},
