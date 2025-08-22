@@ -7,6 +7,6 @@
         public Customer Customer { get; set; }
         public int ScreeningId { get; set; }
         public Screening Screening { get; set; }
-        public int NumSeats { get; set; }
+        public int SeatNumber { get; set; }
     }
 }

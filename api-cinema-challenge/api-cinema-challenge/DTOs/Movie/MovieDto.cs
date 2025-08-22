@@ -1,13 +1,15 @@
-﻿namespace api_cinema_challenge.Models
+﻿using api_cinema_challenge.DTOs.Screening;
+
+namespace api_cinema_challenge.DTOs.Movie
 {
-    public class Movie
+    public class MovieDto
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Rating { get; set; }
         public string Description { get; set; }
         public int RuntimeMins { get; set; }
-        public ICollection<Screening> Screenings { get; set; } = new List<Screening>();
+        public ICollection<ScreeningDto> Screenings { get; set; } = new List<ScreeningDto>();
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
