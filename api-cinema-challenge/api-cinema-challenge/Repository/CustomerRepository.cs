@@ -16,6 +16,9 @@ namespace api_cinema_challenge.Repository
 
         public async Task<Customer> CreateCustomer(Customer customer)
         {
+            var exists = _db.Customers.Where(c => c.Id == customer.Id).Any();
+            if (exists) return null;
+
             await _db.Customers.AddAsync(customer);
             await _db.SaveChangesAsync();
 

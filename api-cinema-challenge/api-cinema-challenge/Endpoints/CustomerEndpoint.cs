@@ -1,6 +1,7 @@
 ﻿using api_cinema_challenge.DTOs.Customer;
 using api_cinema_challenge.Factories;
 using api_cinema_challenge.Repository.Interfaces;
+using api_cinema_challenge.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api_cinema_challenge.Endpoints
@@ -37,13 +38,43 @@ namespace api_cinema_challenge.Endpoints
         [ProducesResponseType(StatusCodes.Status201Created)]
         private static async Task<IResult> CreateCustomer(ICustomerRepository repository, HttpRequest request)
         {
+            CustomerPostDto inDto = await Utility.ValidateFromRequest<CustomerPostDto>(request);
+            if (inDto is null)
+            {
+                return TypedResults.BadRequest();
+            }
 
+            var added = await repository.CreateCustomer(CustomerFactory.CustomerFromPostDto(inDto));
+            if (added is null) 
+            { 
+                return TypedResults.Conflict(); 
+            }
+
+            var outDto = CustomerFactory.DtoFromCustomer(added);
             return TypedResults.Created();
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
-        private static async Task<IResult> UpdateCustomer(ICustomerRepository repository, HttpRequest request)
+        private static async Task<IResult> UpdateCustomer(ICustomerRepository repository, HttpRequest request, int id)
         {
+            CustomerPutDto inDto = await Utility.ValidateFromRequest<CustomerPutDto>(request);
+            if (inDto is null)
+            {
+                return TypedResults.BadRequest();
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            var updated = await repository.UpdateCustomer(CustomerFactory.CustomerFromPutDto(inDto, entity));
+            if (updated is null)
+            {
+                return TypedResults.Conflict();
+            }
+
 
             return TypedResults.Created();
         }
