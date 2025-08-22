@@ -8,5 +8,6 @@
         public int ScreenNumber { get; set; }
         public int Capacity { get; set; }
         public DateTime StartsAt { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 }
