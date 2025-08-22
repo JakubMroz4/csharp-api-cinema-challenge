@@ -13,7 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 // Dependency injection
-builder.Services.AddDbContext<CinemaContext>();
+//builder.Services.AddDbContext<CinemaContext>();
+builder.Services.AddDbContext<CinemaContext>(options => {
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString"))
+    .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+    options.LogTo(message => Debug.WriteLine(message));
+    options.EnableSensitiveDataLogging();
+});
 
 // security
 builder.Services.AddAuthentication().AddJwtBearer();
