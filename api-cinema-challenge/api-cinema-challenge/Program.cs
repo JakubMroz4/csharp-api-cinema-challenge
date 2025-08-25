@@ -1,5 +1,10 @@
 using api_cinema_challenge.Data;
+using api_cinema_challenge.Endpoints;
+using api_cinema_challenge.Models;
+using api_cinema_challenge.Repository;
+using api_cinema_challenge.Repository.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -10,12 +15,14 @@ using Scalar.AspNetCore;
 using System.Diagnostics;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddOpenApi();
 
+/*
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Test API", Version = "v1" });
@@ -44,6 +51,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+*/
 // Dependency injection
 //builder.Services.AddDbContext<CinemaContext>();
 builder.Services.AddDbContext<CinemaContext>(options => {
@@ -53,6 +61,34 @@ builder.Services.AddDbContext<CinemaContext>(options => {
     options.EnableSensitiveDataLogging();
 });
 
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+
+// Support string to enum conversions
+builder.Services.AddControllers().AddJsonOptions(opt =>
+{
+    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+/*
+// Specify identity requirements
+// Must be added before .AddAuthentication otherwise a 404 is thrown on authorized endpoints
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.User.RequireUniqueEmail = true;
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+    })
+    .AddRoles<IdentityRole>();
+    //.AddEntityFrameworkStores<CinemaContext>(); // doesnt work
+
+*/
+
+/*
 // security
 // These will eventually be moved to a secrets file, but for alpha development appsettings is fine
 var validIssuer = builder.Configuration.GetValue<string>("JwtTokenSettings:ValidIssuer");
@@ -81,7 +117,8 @@ builder.Services.AddAuthentication(options =>
         ),
     };
 });
-//builder.Services.AddAuthorization();
+
+*/
 
 var app = builder.Build();
 
@@ -98,9 +135,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 // endpoints configuration
+app.ConfigureCustomerEndpoint();
 
 app.Run();

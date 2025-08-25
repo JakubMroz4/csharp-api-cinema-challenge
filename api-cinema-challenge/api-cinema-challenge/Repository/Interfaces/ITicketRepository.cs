@@ -4,7 +4,7 @@ namespace api_cinema_challenge.Repository.Interfaces
 {
     public interface ITicketRepository
     {
-        public Task<Screening> GetByIdAsync(int customerId, int screeningId);
-        public Task<Screening> CreateScreening(Screening screening);
+        public Task<Ticket> GetByIdAsync(int customerId, int screeningId);
+        public Task<Ticket> CreateTicket(Ticket ticket);
     }
 }

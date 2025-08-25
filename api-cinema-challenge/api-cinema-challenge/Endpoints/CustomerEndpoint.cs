@@ -1,4 +1,5 @@
 ﻿using api_cinema_challenge.DTOs.Customer;
+using api_cinema_challenge.DTOs.Ticket;
 using api_cinema_challenge.Factories;
 using api_cinema_challenge.Repository.Interfaces;
 using api_cinema_challenge.Utils;
@@ -10,7 +11,7 @@ namespace api_cinema_challenge.Endpoints
     {
         public static void ConfigureCustomerEndpoint(this WebApplication app)
         {
-            string groupName = "customer";
+            string groupName = "customers";
             string contentType = "application/json";
 
             var customerGroup = app.MapGroup(groupName);
@@ -19,6 +20,9 @@ namespace api_cinema_challenge.Endpoints
             customerGroup.MapPost("/", CreateCustomer).Accepts<CustomerPostDto>(contentType);
             customerGroup.MapPut("/{customerId}", UpdateCustomer).Accepts<CustomerPutDto>(contentType);
             customerGroup.MapDelete("/{customerId}", DeleteCustomer);
+
+            customerGroup.MapPost("/{customerId}/screenings/{screeningId}", BookTicket).Accepts<TicketPostDto>(contentType);
+            customerGroup.MapGet("/{customerId}/screenings/{screeningId}", GetTickets);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +36,7 @@ namespace api_cinema_challenge.Endpoints
                 dtos.Add(CustomerFactory.DtoFromCustomer(customer));
             }
 
-            return TypedResults.Ok(dtos);
+            return TypedResults.Ok(new { Status = "success", Data = dtos});
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -41,17 +45,21 @@ namespace api_cinema_challenge.Endpoints
             CustomerPostDto inDto = await Utility.ValidateFromRequest<CustomerPostDto>(request);
             if (inDto is null)
             {
-                return TypedResults.BadRequest();
+                return TypedResults.BadRequest( new { status = "failure"} );
             }
 
             var added = await repository.CreateCustomer(CustomerFactory.CustomerFromPostDto(inDto));
             if (added is null) 
             { 
-                return TypedResults.Conflict(); 
+                return TypedResults.BadRequest(new { status = "failure" }); 
             }
 
             var outDto = CustomerFactory.DtoFromCustomer(added);
-            return TypedResults.Created();
+
+            // TODO move to other class
+            var url = $"{request.Scheme}://{request.Host}{request.Path}/{outDto.Id}";
+
+            return TypedResults.Created(url, new {status = "success", data = outDto});
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -60,19 +68,19 @@ namespace api_cinema_challenge.Endpoints
             CustomerPutDto inDto = await Utility.ValidateFromRequest<CustomerPutDto>(request);
             if (inDto is null)
             {
-                return TypedResults.BadRequest();
+                return TypedResults.BadRequest(new { status = "failure" });
             }
 
             var entity = await repository.GetByIdAsync(id);
             if (entity is null)
             {
-                return TypedResults.NotFound();
+                return TypedResults.NotFound(new { status = "failure" });
             }
 
             var updated = await repository.UpdateCustomer(CustomerFactory.CustomerFromPutDto(inDto, entity));
             if (updated is null)
             {
-                return TypedResults.Conflict();
+                return TypedResults.BadRequest(new { status = "failure" });
             }
 
 
@@ -80,9 +88,47 @@ namespace api_cinema_challenge.Endpoints
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        private static async Task<IResult> DeleteCustomer(ICustomerRepository repository, HttpRequest request)
+        private static async Task<IResult> DeleteCustomer(ICustomerRepository repository, int customerId)
         {
+            var customer = await repository.DeleteCustomer(customerId);
+            if (customer is null)
+            {
+                return TypedResults.NotFound(new { status = "failure" });
+            }
 
+            var dto = CustomerFactory.DtoFromCustomer(customer);
+            return TypedResults.Ok( new { status = "success", data = dto});
+        }
+
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        private static async Task<IResult> BookTicket(ITicketRepository ticketRepository, HttpRequest request, int customerId, int screeningId)
+        {
+            TicketPostDto inDto = await Utility.ValidateFromRequest<TicketPostDto>(request);
+            if (inDto is null)
+            {
+                return TypedResults.BadRequest(new { status = "failure" });
+            }
+
+            var ticket = await ticketRepository.CreateTicket(TicketFactory.TicketFromPostDto(inDto, customerId, screeningId));
+            if (ticket is null)
+            {
+                return TypedResults.BadRequest(new { status = "failure" });
+            }
+
+            var dto = TicketFactory.DtoFromTicket(ticket);
+            return TypedResults.Created();
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        private static async Task<IResult> GetTickets(ITicketRepository ticketRepository, int customerId, int screeningId)
+        {
+            var ticket = await ticketRepository.GetByIdAsync(customerId, screeningId);
+            if (ticket is null)
+            {
+                return TypedResults.NotFound(new { status = "failure" });
+            }
+
+            var dto = TicketFactory.DtoFromTicket(ticket);
             return TypedResults.Created();
         }
     }

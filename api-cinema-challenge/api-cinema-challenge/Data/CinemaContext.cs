@@ -13,6 +13,20 @@ namespace api_cinema_challenge.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // relations
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.Customer)
+                .WithMany(c => c.Tickets)
+                .HasForeignKey(t => t.CustomerId);
+
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.Screening)
+                .WithMany(s => s.Tickets)
+                .HasForeignKey(t => t.ScreeningId);
+
+            modelBuilder.Entity<Screening>()
+                .HasOne(s => s.Movie)
+                .WithMany(m => m.Screenings)
+                .HasForeignKey(s => s.MovieId);
 
             // seeder
         }
