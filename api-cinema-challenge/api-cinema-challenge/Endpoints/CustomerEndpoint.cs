@@ -4,6 +4,7 @@ using api_cinema_challenge.Factories;
 using api_cinema_challenge.Models;
 using api_cinema_challenge.Repository.Interfaces;
 using api_cinema_challenge.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api_cinema_challenge.Endpoints
@@ -26,6 +27,7 @@ namespace api_cinema_challenge.Endpoints
             customerGroup.MapGet("/{customerId}/screenings/{screeningId}", GetTickets);
         }
 
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         private static async Task<IResult> GetAllCustomers(ICustomerRepository repository)
         {
@@ -40,7 +42,9 @@ namespace api_cinema_challenge.Endpoints
             return TypedResults.Ok(new { Status = "success", Data = dtos});
         }
 
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         private static async Task<IResult> CreateCustomer(ICustomerRepository repository, HttpRequest request)
         {
             CustomerPostDto inDto = await Utility.ValidateFromRequest<CustomerPostDto>(request);
@@ -63,7 +67,10 @@ namespace api_cinema_challenge.Endpoints
             return TypedResults.Created(url, new {status = "success", data = outDto});
         }
 
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         private static async Task<IResult> UpdateCustomer(ICustomerRepository repository, HttpRequest request, int id)
         {
             CustomerPutDto inDto = await Utility.ValidateFromRequest<CustomerPutDto>(request);
@@ -88,7 +95,9 @@ namespace api_cinema_challenge.Endpoints
             return TypedResults.Created();
         }
 
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         private static async Task<IResult> DeleteCustomer(ICustomerRepository repository, int customerId)
         {
             var customer = await repository.DeleteCustomer(customerId);
@@ -101,7 +110,9 @@ namespace api_cinema_challenge.Endpoints
             return TypedResults.Ok( new { status = "success", data = dto});
         }
 
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         private static async Task<IResult> BookTicket(ITicketRepository ticketRepository, HttpRequest request, int customerId, int screeningId)
         {
             TicketPostDto inDto = await Utility.ValidateFromRequest<TicketPostDto>(request);
@@ -120,7 +131,9 @@ namespace api_cinema_challenge.Endpoints
             return TypedResults.Created();
         }
 
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         private static async Task<IResult> GetTickets(ITicketRepository ticketRepository, HttpRequest request, int customerId, int screeningId)
         {
             var tickets = await ticketRepository.GetByIdAsync(customerId, screeningId);
