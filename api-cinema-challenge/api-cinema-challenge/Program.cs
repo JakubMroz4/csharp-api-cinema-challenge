@@ -5,26 +5,13 @@ using api_cinema_challenge.Repository;
 using api_cinema_challenge.Repository.Interfaces;
 using api_cinema_challenge.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Models;
-using Scalar.AspNetCore;
-using System.Diagnostics;
-using System.Diagnostics;
 using System.Diagnostics;
 using System.Text;
-using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,7 +50,6 @@ builder.Services.AddSwaggerGen(option =>
 
 builder.Services.AddProblemDetails();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
-builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<CinemaContext>(options => {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString"))
@@ -130,20 +116,36 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// policy-based authorization for Admin and User roles
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+        policy.RequireRole("Admin"));
+    options.AddPolicy("User", policy =>
+        policy.RequireRole("User"));
+});
+
+
 // Build the app
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "Demo API");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Test API v1");
+        options.RoutePrefix = "swagger";
     });
-    app.MapScalarApiReference();
+
 }
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Test API v1");
+    options.RoutePrefix = "swagger";
+});
 
 app.UseHttpsRedirection();
 app.UseStatusCodePages();
