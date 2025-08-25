@@ -11,17 +11,17 @@ namespace api_cinema_challenge.Data
 
         public void Seed()
         {
-            var customer1 = new Customer() { Id = 1, Name = "", Email = "", Phone = "" };
-            var customer2 = new Customer() { Id = 2, Name = "", Email = "", Phone = "" };
-            var customer3 = new Customer() { Id = 3, Name = "", Email = "", Phone = "" };
-            var customer4 = new Customer() { Id = 4, Name = "", Email = "", Phone = "" };
-            var customer5 = new Customer() { Id = 5, Name = "", Email = "", Phone = "" };
+            var customer1 = new Customer() { Id = 1, Name = "Adam", Email = "a@a.com", Phone = "111" };
+            var customer2 = new Customer() { Id = 2, Name = "Blazej", Email = "b@b.com", Phone = "222" };
+            var customer3 = new Customer() { Id = 3, Name = "Kristian", Email = "c@c.com", Phone = "333" };
+            var customer4 = new Customer() { Id = 4, Name = "Filip", Email = "d@c.com", Phone = "444" };
+            var customer5 = new Customer() { Id = 5, Name = "Damian", Email = "e@e.com", Phone = "555" };
 
-            var movie1 = new Movie() { Id = 1, Title = "", Rating = "", Description = "", RuntimeMins = 60 };
-            var movie2 = new Movie() { Id = 2, Title = "", Rating = "", Description = "", RuntimeMins = 60 };
-            var movie3 = new Movie() { Id = 3, Title = "", Rating = "", Description = "", RuntimeMins = 60 };
-            var movie4 = new Movie() { Id = 4, Title = "", Rating = "", Description = "", RuntimeMins = 60 };
-            var movie5 = new Movie() { Id = 5, Title = "", Rating = "", Description = "", RuntimeMins = 60 };
+            var movie1 = new Movie() { Id = 1, Title = "Movie One", Rating = "PG13", Description = "fefef", RuntimeMins = 60 };
+            var movie2 = new Movie() { Id = 2, Title = "Movie 2", Rating = "PG13", Description = "hrdr", RuntimeMins = 60 };
+            var movie3 = new Movie() { Id = 3, Title = "333 movie", Rating = "PG13", Description = "esge", RuntimeMins = 60 };
+            var movie4 = new Movie() { Id = 4, Title = "444 movie", Rating = "PG13", Description = "vesve", RuntimeMins = 60 };
+            var movie5 = new Movie() { Id = 5, Title = "555 movie", Rating = "PG13", Description = "dwawd", RuntimeMins = 60 };
 
             var screening1 = new Screening() { Id = 1, MovieId = 1, ScreenNumber = 1, Capacity = 50, StartsAt = DateTime.UtcNow };
             var screening2 = new Screening() { Id = 2, MovieId = 1, ScreenNumber = 1, Capacity = 50, StartsAt = DateTime.UtcNow };
@@ -46,7 +46,7 @@ namespace api_cinema_challenge.Data
             _movies.Add(movie4);
             _movies.Add(movie5);
 
-            _screenings.Add(screening2);
+            _screenings.Add(screening1);
             _screenings.Add(screening2);
 
             _tickets.Add(ticket1);
@@ -58,7 +58,7 @@ namespace api_cinema_challenge.Data
 
         }
 
-        public List<Customer> Customer { get { return _customers; } }
+        public List<Customer> Customers { get { return _customers; } }
         public List<Movie> Movies { get { return _movies; } }
         public List<Screening> Screenings { get { return _screenings; } }
         public List<Ticket> Tickets { get { return _tickets; } }
