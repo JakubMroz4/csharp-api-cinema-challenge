@@ -1,6 +1,7 @@
 ﻿using api_cinema_challenge.DTOs.Customer;
 using api_cinema_challenge.DTOs.Ticket;
 using api_cinema_challenge.Factories;
+using api_cinema_challenge.Models;
 using api_cinema_challenge.Repository.Interfaces;
 using api_cinema_challenge.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -120,16 +121,22 @@ namespace api_cinema_challenge.Endpoints
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        private static async Task<IResult> GetTickets(ITicketRepository ticketRepository, int customerId, int screeningId)
+        private static async Task<IResult> GetTickets(ITicketRepository ticketRepository, HttpRequest request, int customerId, int screeningId)
         {
-            var ticket = await ticketRepository.GetByIdAsync(customerId, screeningId);
-            if (ticket is null)
+            var tickets = await ticketRepository.GetByIdAsync(customerId, screeningId);
+            if (tickets is null)
             {
                 return TypedResults.NotFound(new { status = "failure" });
             }
 
-            var dto = TicketFactory.DtoFromTicket(ticket);
-            return TypedResults.Created();
+            List<TicketDto> dtos = new();
+            foreach (var ticket in tickets)
+            {
+                dtos.Add(TicketFactory.DtoFromTicket(ticket));
+            }
+            // TODO fix url
+            var url = $"{request.Scheme}://{request.Host}{request.Path}/";
+            return TypedResults.Created(url, new { status = "success", data = dtos});
         }
     }
 }

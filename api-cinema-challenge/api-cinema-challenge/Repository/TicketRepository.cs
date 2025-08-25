@@ -2,6 +2,7 @@
 using api_cinema_challenge.Models;
 using api_cinema_challenge.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Sockets;
 
 namespace api_cinema_challenge.Repository
 {
@@ -29,17 +30,22 @@ namespace api_cinema_challenge.Repository
             return ticket;
         }
 
-        public async Task<Ticket> GetByIdAsync(int customerId, int screeningId)
+        public async Task<IEnumerable<Ticket>> GetByIdAsync(int customerId, int screeningId)
         {
-            var ticket = await _db.Tickets
+            bool exists = await _db.Tickets
                 .Where(t => t.CustomerId == customerId)
-                .Where(t => t.ScreeningId==screeningId)
-                .FirstOrDefaultAsync();
+                .Where(t => t.ScreeningId == screeningId)
+                .AnyAsync();
 
-            if (ticket is null)
+            if (!exists)
                 return null;
 
-            return ticket;
+            var tickets = await _db.Tickets
+                .Where(t => t.CustomerId == customerId)
+                .Where(t => t.ScreeningId==screeningId)
+                .ToListAsync();
+
+            return tickets;
         }
     }
 }
