@@ -2,9 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+
 namespace api_cinema_challenge.Data
 {
-    public class CinemaContext : DbContext
+    // IdentityUserContext instead of Db in workshop
+    public class CinemaContext : IdentityDbContext<ApplicationUser>
     {
         public CinemaContext(DbContextOptions<CinemaContext> options) : base(options)
         {
@@ -12,6 +17,12 @@ namespace api_cinema_challenge.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder); // ← This is crucial
+                                                // Optional: configure enum as string
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(u => u.Role)
+                .HasConversion<string>();
+
             // relations
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Customer)

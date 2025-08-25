@@ -6,6 +6,6 @@ namespace api_cinema_challenge.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public RoleEnum Role { get; set; }
+        public Role Role { get; set; }
     }
 }

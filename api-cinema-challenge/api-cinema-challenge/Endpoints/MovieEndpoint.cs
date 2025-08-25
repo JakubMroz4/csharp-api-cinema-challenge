@@ -12,7 +12,7 @@ namespace api_cinema_challenge.Endpoints
 {
     public static class MovieEndpoint
     {
-        public static void ConfigureCustomerEndpoint(this WebApplication app)
+        public static void ConfigureMovieEndpoint(this WebApplication app)
         {
             const string groupName = "movies";
             const string contentType = "application/json";

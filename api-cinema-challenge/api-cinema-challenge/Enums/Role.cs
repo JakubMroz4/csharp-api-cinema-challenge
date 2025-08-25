@@ -1,6 +1,6 @@
 ﻿namespace api_cinema_challenge.Enums
 {
-    public enum RoleEnum
+    public enum Role
     {
         User,
         Admin
