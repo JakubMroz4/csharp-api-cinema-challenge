@@ -76,6 +76,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IScreeningRepository, ScreeningRepository>();
+builder.Services.AddScoped<TokenService, TokenService>();
 
 // Support string to enum conversions
 builder.Services.AddControllers().AddJsonOptions(opt =>
